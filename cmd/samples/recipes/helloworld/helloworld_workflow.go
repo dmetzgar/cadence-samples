@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.uber.org/cadence/activity"
@@ -20,10 +21,20 @@ const helloWorldWorkflowName = "helloWorldWorkflow"
 
 // helloWorkflow workflow decider
 func helloWorldWorkflow(ctx workflow.Context, name string) error {
+	retry := workflow.RetryPolicy{
+		InitialInterval:          time.Second,
+		BackoffCoefficient:       0,
+		MaximumInterval:          0,
+		ExpirationInterval:       0,
+		MaximumAttempts:          1,
+		NonRetriableErrorReasons: nil,
+	}
+
 	ao := workflow.ActivityOptions{
 		ScheduleToStartTimeout: time.Minute,
 		StartToCloseTimeout:    time.Minute,
 		HeartbeatTimeout:       time.Second * 20,
+		RetryPolicy:            &retry,
 	}
 	ctx = workflow.WithActivityOptions(ctx, ao)
 
@@ -58,6 +69,12 @@ func helloWorldWorkflow(ctx workflow.Context, name string) error {
 }
 
 func helloWorldActivity(ctx context.Context, name string) (string, error) {
+	fmt.Printf("Hello %s!\n", name)
+	fmt.Printf("Attempt %v!\n", activity.GetInfo(ctx).Attempt)
+	if activity.GetInfo(ctx).Attempt == 0 {
+		return "", fmt.Errorf("retryable error")
+	}
+
 	logger := activity.GetLogger(ctx)
 	logger.Info("helloworld activity started")
 	return "Hello " + name + "!", nil
