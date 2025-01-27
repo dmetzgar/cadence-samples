@@ -20,7 +20,7 @@ make <WORKFLOW NAME>
 
 Example:
     make delaystart 
-    make hellowrold 
+    make helloworld 
 ```
 
 ### Run HelloWorld Sample
