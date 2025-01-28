@@ -19,7 +19,6 @@ make
 make <WORKFLOW NAME>
 
 Example:
-    make delaystart 
     make helloworld 
 ```
 
