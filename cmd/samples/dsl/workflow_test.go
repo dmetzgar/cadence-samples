@@ -98,13 +98,9 @@ func TestActivitySequenceParallelStatements(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			env := testSuite.NewTestWorkflowEnvironment()
-			env.RegisterWorkflow(simpleDSLWorkflow)
-
-			// Register a sample activity
 			env.RegisterActivityWithOptions(sampleActivity, activity.RegisterOptions{
 				Name: "sampleActivity",
 			})
-
 			env.ExecuteWorkflow(func(ctx workflow.Context) error {
 				ctx = workflow.WithActivityOptions(ctx, workflow.ActivityOptions{
 					ScheduleToStartTimeout: time.Minute,
@@ -207,9 +203,6 @@ func TestSequenceFlow(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			env := testSuite.NewTestWorkflowEnvironment()
-			env.RegisterWorkflow(simpleDSLWorkflow)
-
-			// Register a sample activity
 			env.RegisterActivityWithOptions(sampleActivity, activity.RegisterOptions{
 				Name: "sampleActivity",
 			})
@@ -316,9 +309,6 @@ func TestParallelFlow(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			env := testSuite.NewTestWorkflowEnvironment()
-			env.RegisterWorkflow(simpleDSLWorkflow)
-
-			// Register a sample activity
 			env.RegisterActivityWithOptions(sampleActivity, activity.RegisterOptions{
 				Name: "sampleActivity",
 			})
@@ -379,9 +369,6 @@ func TestActivityInvocationFlow(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			env := testSuite.NewTestWorkflowEnvironment()
-			env.RegisterWorkflow(simpleDSLWorkflow)
-
-			// Register a sample activity
 			env.RegisterActivityWithOptions(sampleActivity, activity.RegisterOptions{
 				Name: "sampleActivity",
 			})
@@ -407,7 +394,6 @@ func TestActivityInvocationFlow(t *testing.T) {
 func Test_SimpleDSLWorkflow(t *testing.T) {
 	testSuite := &testsuite.WorkflowTestSuite{}
 	env := testSuite.NewTestWorkflowEnvironment()
-	env.RegisterWorkflow(simpleDSLWorkflow)
 
 	// Define a sample DSL workflow
 	dslWorkflow := Workflow{
