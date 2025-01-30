@@ -13,52 +13,7 @@ import (
 	"go.uber.org/cadence/workflow"
 )
 
-func Test_SimpleDSLWorkflow(t *testing.T) {
-	testSuite := &testsuite.WorkflowTestSuite{}
-	env := testSuite.NewTestWorkflowEnvironment()
-	env.RegisterWorkflow(simpleDSLWorkflow)
-
-	// Define a sample DSL workflow
-	dslWorkflow := Workflow{
-		Variables: map[string]string{
-			"var1": "value1",
-			"var2": "value2",
-		},
-		Root: Statement{
-			Activity: &ActivityInvocation{
-				Name:      "sampleActivity",
-				Arguments: []string{"var1", "var2"},
-				Result:    "resultVar",
-			},
-		},
-	}
-
-	// Register a sample activity
-	env.RegisterActivityWithOptions(sampleActivity, activity.RegisterOptions{
-		Name: "sampleActivity",
-	})
-
-	var activityCalled []string
-	env.SetOnActivityStartedListener(func(activityInfo *activity.Info, ctx context.Context, args encoded.Values) {
-		activityType := activityInfo.ActivityType.Name
-		activityCalled = append(activityCalled, activityType)
-		require.Equal(t, "sampleActivity", activityType)
-	})
-
-	env.ExecuteWorkflow(simpleDSLWorkflow, dslWorkflow)
-
-	require.True(t, env.IsWorkflowCompleted())
-	require.NoError(t, env.GetWorkflowError())
-	require.Equal(t, []string{"sampleActivity"}, activityCalled)
-}
-
-func sampleActivity(input []string) (string, error) {
-	name := "sampleActivity"
-	fmt.Printf("Run %s with input %v \n", name, input)
-	return "Result_" + name, nil
-}
-
-func TestActivitySequenceParallelStatements_execute(t *testing.T) {
+func TestActivitySequenceParallelStatements(t *testing.T) {
 	testSuite := &testsuite.WorkflowTestSuite{}
 
 	tests := []struct {
@@ -168,7 +123,7 @@ func TestActivitySequenceParallelStatements_execute(t *testing.T) {
 	}
 }
 
-func TestSequence_execute(t *testing.T) {
+func TestSequenceFlow(t *testing.T) {
 	testSuite := &testsuite.WorkflowTestSuite{}
 
 	tests := []struct {
@@ -277,7 +232,7 @@ func TestSequence_execute(t *testing.T) {
 	}
 }
 
-func TestParallel_execute(t *testing.T) {
+func TestParallelFlow(t *testing.T) {
 	testSuite := &testsuite.WorkflowTestSuite{}
 
 	tests := []struct {
@@ -386,7 +341,7 @@ func TestParallel_execute(t *testing.T) {
 	}
 }
 
-func TestActivityInvocation_execute(t *testing.T) {
+func TestActivityInvocationFlow(t *testing.T) {
 	testSuite := &testsuite.WorkflowTestSuite{}
 
 	tests := []struct {
@@ -447,4 +402,49 @@ func TestActivityInvocation_execute(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_SimpleDSLWorkflow(t *testing.T) {
+	testSuite := &testsuite.WorkflowTestSuite{}
+	env := testSuite.NewTestWorkflowEnvironment()
+	env.RegisterWorkflow(simpleDSLWorkflow)
+
+	// Define a sample DSL workflow
+	dslWorkflow := Workflow{
+		Variables: map[string]string{
+			"var1": "value1",
+			"var2": "value2",
+		},
+		Root: Statement{
+			Activity: &ActivityInvocation{
+				Name:      "sampleActivity",
+				Arguments: []string{"var1", "var2"},
+				Result:    "resultVar",
+			},
+		},
+	}
+
+	// Register a sample activity
+	env.RegisterActivityWithOptions(sampleActivity, activity.RegisterOptions{
+		Name: "sampleActivity",
+	})
+
+	var activityCalled []string
+	env.SetOnActivityStartedListener(func(activityInfo *activity.Info, ctx context.Context, args encoded.Values) {
+		activityType := activityInfo.ActivityType.Name
+		activityCalled = append(activityCalled, activityType)
+		require.Equal(t, "sampleActivity", activityType)
+	})
+
+	env.ExecuteWorkflow(simpleDSLWorkflow, dslWorkflow)
+
+	require.True(t, env.IsWorkflowCompleted())
+	require.NoError(t, env.GetWorkflowError())
+	require.Equal(t, []string{"sampleActivity"}, activityCalled)
+}
+
+func sampleActivity(input []string) (string, error) {
+	name := "sampleActivity"
+	fmt.Printf("Run %s with input %v \n", name, input)
+	return "Result_" + name, nil
 }
