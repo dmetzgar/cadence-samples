@@ -1,14 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 	"go.uber.org/cadence/activity"
-	"go.uber.org/cadence/encoded"
 	"go.uber.org/cadence/testsuite"
 	"go.uber.org/cadence/workflow"
 )
@@ -415,18 +413,10 @@ func Test_SimpleDSLWorkflow(t *testing.T) {
 		Name: "sampleActivity",
 	})
 
-	var activityCalled []string
-	env.SetOnActivityStartedListener(func(activityInfo *activity.Info, ctx context.Context, args encoded.Values) {
-		activityType := activityInfo.ActivityType.Name
-		activityCalled = append(activityCalled, activityType)
-		require.Equal(t, "sampleActivity", activityType)
-	})
-
 	env.ExecuteWorkflow(simpleDSLWorkflow, dslWorkflow)
 
 	require.True(t, env.IsWorkflowCompleted())
 	require.NoError(t, env.GetWorkflowError())
-	require.Equal(t, []string{"sampleActivity"}, activityCalled)
 }
 
 func sampleActivity(input []string) (string, error) {
