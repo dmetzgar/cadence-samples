@@ -53,8 +53,6 @@ func (s *UnitTestSuite) Test_WorkflowWithMockActivities() {
 
 func (s *UnitTestSuite) Test_TimeoutWithMockActivities() {
 	s.env.OnActivity(createExpenseActivity, mock.Anything, mock.Anything).Return(nil).Once()
-	// s.env.OnActivity(waitForDecisionActivity, mock.Anything, mock.Anything).Return("APPROVED", nil).Once()
-	// s.env.OnActivity(paymentActivity, mock.Anything, mock.Anything).Return(nil).Once()
 	s.env.SetWorkflowTimeout(time.Microsecond * 500)
 	s.env.SetTestTimeout(time.Minute * 10)
 
@@ -69,7 +67,6 @@ func (s *UnitTestSuite) Test_TimeoutWithMockActivities() {
 func (s *UnitTestSuite) Test_WorkflowStatusRejected() {
 	s.env.OnActivity(createExpenseActivity, mock.Anything, mock.Anything).Return(nil).Once()
 	s.env.OnActivity(waitForDecisionActivity, mock.Anything, mock.Anything).Return("REJECTED", nil).Once()
-	// s.env.OnActivity(paymentActivity, mock.Anything, mock.Anything).Return(nil).Once()
 
 	s.env.ExecuteWorkflow(sampleExpenseWorkflow, "test-expense-id")
 
